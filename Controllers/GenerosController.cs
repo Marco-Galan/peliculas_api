@@ -15,13 +15,17 @@ namespace peliculas_api.Controllers
         private readonly ServicioScoped scoped1;
         private readonly ServicioScoped scoped2;
         private readonly ServicioSingleton singleton;
+        private readonly IOutputCacheStore outputCacheStore;
+        // Constante para el tag de cache
+        private const string cacheTag = "generos"; 
 
         public GenerosController(IRepositorio repositorio,
             ServicioTrasient trasient1,
             ServicioTrasient trasient2,
             ServicioScoped scoped1,
             ServicioScoped scoped2,
-            ServicioSingleton singleton
+            ServicioSingleton singleton,
+            IOutputCacheStore outputCacheStore // Servicio de cache
             )
         {
             this.repositorio = repositorio;
@@ -30,6 +34,7 @@ namespace peliculas_api.Controllers
             this.scoped1 = scoped1;
             this.scoped2 = scoped2;
             this.singleton = singleton;
+            this.outputCacheStore = outputCacheStore;
         }
 
         [HttpGet("ServiciosTiemposVida")]
@@ -55,7 +60,7 @@ namespace peliculas_api.Controllers
         [HttpGet] //api/generos
         [HttpGet("listado")] //url-> api/generos/listado
         [HttpGet("/listado/generos")] //Url-> /listado/generos
-        [OutputCache]
+        [OutputCache(Tags = [cacheTag])] // Limpia cache
         public List<Genero> Get()
         {
             var generos = repositorio.ObtenerTodosLosDatos();
@@ -63,7 +68,7 @@ namespace peliculas_api.Controllers
         }
 
         [HttpGet("{id:int}")] // api/generos/500
-        [OutputCache] // //Se agrega cache 1.3
+        [OutputCache (Tags = [cacheTag])] // Limpia cache
         public async Task<ActionResult<Genero>> Get(int id)
         //Fucnion ActionResult<Genero> : Clase base que define el resultado que una acción en un controlador puede devolver
         {
@@ -86,7 +91,7 @@ namespace peliculas_api.Controllers
 
         [HttpPost()]
         //IActionResult para retornar valores booleanos
-        public IActionResult Post([FromBody] Genero genero)
+        public async Task<IActionResult> Post([FromBody] Genero genero)
         {
             var generoExistente = repositorio.Existe(genero.Nombre);
 
@@ -96,7 +101,9 @@ namespace peliculas_api.Controllers
             }
 
             repositorio.Crear(genero);
-
+            // Se agrega tag en outputCache para eliminar cache
+            await outputCacheStore.EvictByTagAsync(cacheTag, default);
+            
             return Ok();
             //var g = new Genero() { Nombre = "Drama" };
 
