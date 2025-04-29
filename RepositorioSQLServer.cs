@@ -40,5 +40,10 @@ namespace peliculas_api
         {
             return _generos;
         }
+
+        public void Crear(Genero genero)
+        {
+            _generos.Add(genero);
+        }
     }
 }

@@ -12,12 +12,12 @@ builder.Services.AddSwaggerGen();
 // Se Agrega cache 1
 builder.Services.AddOutputCache(opciones =>
     {
-        opciones.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(10);
+        opciones.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(60);
 
     });
 //Se Agrega inyeccion de depencia Repositorio en Memoria
 //AddTrasient permite configurar servicio
-builder.Services.AddTransient<IRepositorio, RepositorioSQLServer>();
+builder.Services.AddSingleton<IRepositorio, RepositorioEnMemoria>();
 
 //Agregando servicios de memoria
 builder.Services.AddTransient<ServicioTrasient>();

@@ -7,7 +7,7 @@ namespace peliculas_api
         List<Genero> ObtenerGeneros();
         List<Genero> ObtenerTodosLosDatos();
         Task<Genero?> ObtenerPorId(int id);
-        
         bool Existe(string nombre);
+        void Crear(Genero genero);
     }
 }

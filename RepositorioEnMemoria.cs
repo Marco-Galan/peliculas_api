@@ -23,7 +23,11 @@ namespace peliculas_api
             return _generos;
         }
 
-    
+        public void Crear(Genero genero)
+        {
+            _generos.Add(genero);
+        }
+
         public async Task<Genero?> ObtenerPorId(int id)
         //public Genero? ObtenerPorId(int id)
         {
@@ -40,6 +44,8 @@ namespace peliculas_api
         {
             return _generos;
         }
+
+    
 
 
         // Los metodos void solo se pone Task y el await igual

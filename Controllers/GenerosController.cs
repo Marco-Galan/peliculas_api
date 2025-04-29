@@ -95,6 +95,8 @@ namespace peliculas_api.Controllers
                 return BadRequest($"El genero {genero.Nombre} ya esta registrado");
             }
 
+            repositorio.Crear(genero);
+
             return Ok();
             //var g = new Genero() { Nombre = "Drama" };
 
