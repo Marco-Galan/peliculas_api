@@ -19,6 +19,11 @@ builder.Services.AddOutputCache(opciones =>
 //AddTrasient permite configurar servicio
 builder.Services.AddTransient<IRepositorio, RepositorioSQLServer>();
 
+//Agregando servicios de memoria
+builder.Services.AddTransient<ServicioTrasient>();
+builder.Services.AddScoped<ServicioScoped>();
+builder.Services.AddSingleton<ServicioSingleton>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

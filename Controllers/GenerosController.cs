@@ -10,9 +10,46 @@ namespace peliculas_api.Controllers
     {   //Acopalmiento fuerte
         // Configuracion de dependencia
         private readonly IRepositorio repositorio;
-        public GenerosController(IRepositorio repositorio)
+        private readonly ServicioTrasient trasient1;
+        private readonly ServicioTrasient trasient2;
+        private readonly ServicioScoped scoped1;
+        private readonly ServicioScoped scoped2;
+        private readonly ServicioSingleton singleton;
+
+        public GenerosController(IRepositorio repositorio,
+            ServicioTrasient trasient1,
+            ServicioTrasient trasient2,
+            ServicioScoped scoped1,
+            ServicioScoped scoped2,
+            ServicioSingleton singleton
+            )
         {
             this.repositorio = repositorio;
+            this.trasient1 = trasient1;
+            this.trasient2 = trasient2;
+            this.scoped1 = scoped1;
+            this.scoped2 = scoped2;
+            this.singleton = singleton;
+        }
+
+        [HttpGet("ServiciosTiemposVida")]
+        public IActionResult ObtenerTiemposVidaServicios()
+        {
+            return Ok(new
+            {
+
+                Trasients = new
+                {
+                    Trasient1 = trasient1.ObtenerId,
+                    Trasient2 = trasient2.ObtenerId
+                },
+                Scopeds = new
+                {
+                    Scoped1 = scoped1.ObtenerId,
+                    Scoped2 = scoped2.ObtenerId
+                },
+                Singleton = singleton.ObtenerId
+            });
         }
 
         [HttpGet] //api/generos
