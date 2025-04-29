@@ -7,8 +7,7 @@ namespace peliculas_api.Controllers
     [Route("api/generos")]
     [ApiController]
     public class GenerosController : ControllerBase // :ControllerBase -> Acceso a controlres auxiliares
-    {   //Acopalmiento fuerte
-        // Configuracion de dependencia
+    {   //Acopalmiento fuerte / Configuracion de dependencia
         private readonly IRepositorio repositorio;
         private readonly ServicioTrasient trasient1;
         private readonly ServicioTrasient trasient2;
@@ -16,6 +15,8 @@ namespace peliculas_api.Controllers
         private readonly ServicioScoped scoped2;
         private readonly ServicioSingleton singleton;
         private readonly IOutputCacheStore outputCacheStore;
+        private readonly IConfiguration configuration;
+
         // Constante para el tag de cache
         private const string cacheTag = "generos"; 
 
@@ -25,7 +26,8 @@ namespace peliculas_api.Controllers
             ServicioScoped scoped1,
             ServicioScoped scoped2,
             ServicioSingleton singleton,
-            IOutputCacheStore outputCacheStore // Servicio de cache
+            IOutputCacheStore outputCacheStore, // Servicio de cache
+            IConfiguration configuration //Configuracion de la aplicacion
             )
         {
             this.repositorio = repositorio;
@@ -35,6 +37,14 @@ namespace peliculas_api.Controllers
             this.scoped2 = scoped2;
             this.singleton = singleton;
             this.outputCacheStore = outputCacheStore;
+            this.configuration = configuration;
+        }
+
+        [HttpGet("ejemplo-proveedor-configuraacion")]
+        public string GetEjemploProveedorConfiguracion()
+        {
+            // Se obtiene la configuracion local o produccion
+            return configuration.GetValue<string>("Conexion");
         }
 
         [HttpGet("ServiciosTiemposVida")]

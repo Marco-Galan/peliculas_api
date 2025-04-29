@@ -27,19 +27,21 @@ builder.Services.AddSingleton<ServicioSingleton>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
+//Se usara Swagger en todos los entornos
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 //Se agrega cache 1.1
 app.UseOutputCache();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
