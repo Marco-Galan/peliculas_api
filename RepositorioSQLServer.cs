@@ -2,19 +2,19 @@
 
 namespace peliculas_api
 {
-    // Se implementa la interfaz IRepositorio
-    public class RepositorioEnMemoria : IRepositorio
+    public class RepositorioSQLServer: IRepositorio
     {
+
         private List<Genero> _generos;
 
-        public RepositorioEnMemoria()
+        public RepositorioSQLServer()
         {
             _generos = new List<Genero>
 
             {
-                new Genero{Id = 1, Nombre = "Comedia"},
-                new Genero{Id = 2, Nombre = "Accion"},
-                new Genero{Id = 3, Nombre = "Animación"}
+                new Genero{Id = 1, Nombre = "Comedia SQL"},
+                new Genero{Id = 2, Nombre = "Accion SQL"},
+                new Genero{Id = 3, Nombre = "Animación SQL"}
             };
         }
 
@@ -23,7 +23,7 @@ namespace peliculas_api
             return _generos;
         }
 
-    
+
         public async Task<Genero?> ObtenerPorId(int id)
         //public Genero? ObtenerPorId(int id)
         {
@@ -40,13 +40,5 @@ namespace peliculas_api
         {
             return _generos;
         }
-
-
-        // Los metodos void solo se pone Task y el await igual
-        //private async Task Loguear()
-        //{
-        //    //logueo
-        //}
-
     }
 }

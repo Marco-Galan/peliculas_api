@@ -8,9 +8,9 @@ namespace peliculas_api.Controllers
     [ApiController]
     public class GenerosController : ControllerBase // :ControllerBase -> Acceso a controlres auxiliares
     {   //Acopalmiento fuerte
-        // 
-        private readonly RepositorioEnMemoria repositorio;
-        public GenerosController(RepositorioEnMemoria repositorio)
+        // Configuracion de dependencia
+        private readonly IRepositorio repositorio;
+        public GenerosController(IRepositorio repositorio)
         {
             this.repositorio = repositorio;
         }
@@ -21,7 +21,7 @@ namespace peliculas_api.Controllers
         [OutputCache]
         public List<Genero> Get()
         {
-            var generos = repositorio.obtenerTodosLosDatos();
+            var generos = repositorio.ObtenerTodosLosDatos();
             return generos;
         }
 

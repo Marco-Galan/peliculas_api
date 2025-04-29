@@ -22,7 +22,7 @@ namespace peliculas_api.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             var repositorio = new RepositorioEnMemoria();
-            var generos = repositorio.obtenerTodosLosDatos();
+            var generos = repositorio.ObtenerTodosLosDatos();
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

@@ -15,8 +15,9 @@ builder.Services.AddOutputCache(opciones =>
         opciones.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(10);
 
     });
-//Se Agrega inyeccion de dependea Repositorio en Memoria
-builder.Services.AddTransient<RepositorioEnMemoria>();
+//Se Agrega inyeccion de depencia Repositorio en Memoria
+//AddTrasient permite configurar servicio
+builder.Services.AddTransient<IRepositorio, RepositorioSQLServer>();
 
 var app = builder.Build();
 
