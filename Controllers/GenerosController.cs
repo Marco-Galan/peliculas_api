@@ -1,134 +1,82 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using peliculas_api.DTOs;
 using peliculas_api.entidades;
 
 namespace peliculas_api.Controllers
 {
     [Route("api/generos")]
     [ApiController]
-    public class GenerosController : ControllerBase // :ControllerBase -> Acceso a controlres auxiliares
+    public class GenerosController : ControllerBase 
+        // :ControllerBase -> Acceso a controlres auxiliares
     {   //Acopalmiento fuerte / Configuracion de dependencia
-        private readonly IRepositorio repositorio;
-        private readonly ServicioTrasient trasient1;
-        private readonly ServicioTrasient trasient2;
-        private readonly ServicioScoped scoped1;
-        private readonly ServicioScoped scoped2;
-        private readonly ServicioSingleton singleton;
         private readonly IOutputCacheStore outputCacheStore;
-        private readonly IConfiguration configuration;
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
 
         // Constante para el tag de cache
         private const string cacheTag = "generos"; 
 
-        public GenerosController(IRepositorio repositorio,
-            ServicioTrasient trasient1,
-            ServicioTrasient trasient2,
-            ServicioScoped scoped1,
-            ServicioScoped scoped2,
-            ServicioSingleton singleton,
-            IOutputCacheStore outputCacheStore, // Servicio de cache
-            IConfiguration configuration //Configuracion de la aplicacion
+        public GenerosController(
+            // Servicio de cache
+            IOutputCacheStore outputCacheStore,
+            ApplicationDbContext context,
+            IMapper mapper
             )
         {
-            this.repositorio = repositorio;
-            this.trasient1 = trasient1;
-            this.trasient2 = trasient2;
-            this.scoped1 = scoped1;
-            this.scoped2 = scoped2;
-            this.singleton = singleton;
             this.outputCacheStore = outputCacheStore;
-            this.configuration = configuration;
+            this.context = context;
+            this.mapper = mapper;
         }
 
-        [HttpGet("ejemplo-proveedor-configuraacion")]
-        public string GetEjemploProveedorConfiguracion()
-        {
-            // Se obtiene la configuracion local o produccion
-            return configuration.GetValue<string>("Conexion");
-        }
-
-        [HttpGet("ServiciosTiemposVida")]
-        public IActionResult ObtenerTiemposVidaServicios()
-        {
-            return Ok(new
-            {
-
-                Trasients = new
-                {
-                    Trasient1 = trasient1.ObtenerId,
-                    Trasient2 = trasient2.ObtenerId
-                },
-                Scopeds = new
-                {
-                    Scoped1 = scoped1.ObtenerId,
-                    Scoped2 = scoped2.ObtenerId
-                },
-                Singleton = singleton.ObtenerId
-            });
-        }
 
         [HttpGet] //api/generos
-        [HttpGet("listado")] //url-> api/generos/listado
-        [HttpGet("/listado/generos")] //Url-> /listado/generos
         [OutputCache(Tags = [cacheTag])] // Limpia cache
-        public List<Genero> Get()
+        public List<GeneroDTO> Get()
         {
-            var generos = repositorio.ObtenerTodosLosDatos();
-            return generos;
+            return new List<GeneroDTO>() { 
+                new GeneroDTO() { 
+                    id = 1, Nombre = "Comedia" 
+                } ,
+                new GeneroDTO() {
+                    id = 2, Nombre = "Acción"
+                },
+                new GeneroDTO() {
+                    id = 3, Nombre = "Terror"
+                }
+            };
         }
 
-        [HttpGet("{id:int}")] // api/generos/500
+        [HttpGet("{id:int}", Name = "ObtenerGeneroPorId")] // api/generos/500
         [OutputCache (Tags = [cacheTag])] // Limpia cache
         public async Task<ActionResult<Genero>> Get(int id)
+        {
+            throw new NotImplementedException();
+        }
+        
         //Fucnion ActionResult<Genero> : Clase base que define el resultado que una acción en un controlador puede devolver
+        [HttpPost]
+        public async Task<ActionResult<Genero>> Post([FromBody] GeneroCreacionDTO generoCreacionDTO)
+
         {
-            var genero = await repositorio.ObtenerPorId(id);
-
-            if (genero is null)
-            {
-                return NotFound();
-            }
-
-            return genero;
+            //Se guardan los datos asincronamente
+            var genero = mapper.Map<Genero>(generoCreacionDTO);
+            context.Add(genero);
+            await context.SaveChangesAsync();
+            return CreatedAtRoute("ObtenerGeneroPorId", new { id = genero.id }, genero);
         }
 
-        [HttpGet("{nombre}")] // api/generos/{nombre}
-        public async Task<Genero?> Get(string nombre)
-        {
-            var genero = await repositorio.ObtenerPorId(1);
-            return genero;
-        }
-
-        [HttpPost()]
-        //IActionResult para retornar valores booleanos
-        public async Task<IActionResult> Post([FromBody] Genero genero)
-        {
-            var generoExistente = repositorio.Existe(genero.Nombre);
-
-            if (generoExistente)
-            {
-                return BadRequest($"El genero {genero.Nombre} ya esta registrado");
-            }
-
-            repositorio.Crear(genero);
-            // Se agrega tag en outputCache para eliminar cache
-            await outputCacheStore.EvictByTagAsync(cacheTag, default);
-            
-            return Ok();
-            //var g = new Genero() { Nombre = "Drama" };
-
-
-        }
         [HttpPut]
         public void Put()
         {
-
+            throw new NotImplementedException();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         public void Delete()
         {
-
+            throw new NotImplementedException();
         }
     }
 }
