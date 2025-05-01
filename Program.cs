@@ -26,11 +26,12 @@ var originesPermitidos = builder.Configuration.GetValue<string>("origenesPermiti
 
 //Se agregan permisos de CORS
 // Permite el acceso a la API desde cualquier origen
-builder.Services.AddCors(
-    opciones => {
-        opciones.AddDefaultPolicy(
+builder.Services.AddCors( opciones => {
+        
+    opciones.AddDefaultPolicy(
             //Se agrega la variable que contiene los orígenes permitidos
-            opcionesCORS => {
+            opcionesCORS => 
+            {
                 opcionesCORS.WithOrigins(originesPermitidos).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("totalRegistros");
             }
         );

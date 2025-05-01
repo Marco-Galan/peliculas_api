@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.EntityFrameworkCore;
 using peliculas_api.DTOs;
 using peliculas_api.entidades;
+using peliculas_api.Utilidades;
 
 namespace peliculas_api.Controllers
 {
@@ -33,19 +36,15 @@ namespace peliculas_api.Controllers
 
         [HttpGet] //api/generos
         [OutputCache(Tags = [cacheTag])] // Limpia cache
-        public List<GeneroDTO> Get()
+        public async Task<List<GeneroDTO>> Get([FromQuery] PaginacionDTO paginacion)
         {
-            return new List<GeneroDTO>() { 
-                new GeneroDTO() { 
-                    id = 1, Nombre = "Comedia" 
-                } ,
-                new GeneroDTO() {
-                    id = 2, Nombre = "Acción"
-                },
-                new GeneroDTO() {
-                    id = 3, Nombre = "Terror"
-                }
-            };
+            var queryable = context.Generos;
+            await HttpContext.ParametrosPaginacionCabecera(queryable);
+            return await queryable
+                .OrderBy(g => g.Nombre)
+                .Paginar(paginacion)
+                .ProjectTo<GeneroDTO>(mapper.ConfigurationProvider).ToListAsync();
+            
         }
 
         [HttpGet("{id:int}", Name = "ObtenerGeneroPorId")] // api/generos/500
