@@ -11,15 +11,13 @@ namespace peliculas_api.Controllers
 {
     [Route("api/generos")]
     [ApiController]
-    public class GenerosController : ControllerBase 
-        // :ControllerBase -> Acceso a controlres auxiliares
+    public class GenerosController : ControllerBase
+    // :ControllerBase -> Acceso a controlres auxiliares
     {   //Acopalmiento fuerte / Configuracion de dependencia
         private readonly IOutputCacheStore outputCacheStore;
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
-
-        // Constante para el tag de cache
-        private const string cacheTag = "generos"; 
+        private const string cacheTag = "generos";  // Constante para el tag de cache
 
         public GenerosController(
             // Servicio de cache
@@ -44,16 +42,26 @@ namespace peliculas_api.Controllers
                 .OrderBy(g => g.Nombre)
                 .Paginar(paginacion)
                 .ProjectTo<GeneroDTO>(mapper.ConfigurationProvider).ToListAsync();
-            
+
         }
 
         [HttpGet("{id:int}", Name = "ObtenerGeneroPorId")] // api/generos/500
-        [OutputCache (Tags = [cacheTag])] // Limpia cache
-        public async Task<ActionResult<Genero>> Get(int id)
+        [OutputCache(Tags = [cacheTag])] // Limpia cache
+
+        public async Task<ActionResult<GeneroDTO>> Get(int id) // api/generos/500
         {
-            throw new NotImplementedException();
+            var genero = await context.Generos
+                .ProjectTo<GeneroDTO>(mapper.ConfigurationProvider)
+                // Se busca el id en la base de datos
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (genero is null)
+            {
+                return NotFound();
+            }
+            return genero;
         }
-        
+
         //Fucnion ActionResult<Genero> : Clase base que define el resultado que una acción en un controlador puede devolver
         [HttpPost]
         public async Task<ActionResult<Genero>> Post([FromBody] GeneroCreacionDTO generoCreacionDTO)
@@ -63,13 +71,26 @@ namespace peliculas_api.Controllers
             var genero = mapper.Map<Genero>(generoCreacionDTO);
             context.Add(genero);
             await context.SaveChangesAsync();
-            return CreatedAtRoute("ObtenerGeneroPorId", new { id = genero.id }, genero);
+            await outputCacheStore.EvictByTagAsync(cacheTag, default); // Elimina el cache
+            return CreatedAtRoute("ObtenerGeneroPorId", new { id = genero.Id }, genero);
         }
 
-        [HttpPut]
-        public void Put()
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult>Put(int id, [FromBody] GeneroCreacionDTO generoCreacionDTO)
         {
-            throw new NotImplementedException();
+            var generoExistente = await context.Generos.AnyAsync(g => g.Id == id);
+            if (!generoExistente)
+            {
+                return NotFound();
+            }
+            var genero = mapper.Map<Genero>(generoCreacionDTO);
+            genero.Id = id;
+            context.Update(genero);
+            await context.SaveChangesAsync();
+            await outputCacheStore.EvictByTagAsync(cacheTag, default);
+
+            return NoContent();
+
         }
 
         [HttpDelete("{id:int}")]

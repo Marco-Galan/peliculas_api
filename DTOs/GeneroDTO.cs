@@ -5,7 +5,7 @@ namespace peliculas_api.DTOs
 {
     public class GeneroDTO
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public required string Nombre { get; set; }
 
     }

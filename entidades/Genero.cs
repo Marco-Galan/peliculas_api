@@ -5,21 +5,11 @@ namespace peliculas_api.entidades
 {
     public class Genero
     {
-        public int id { get; set; }
-        [Required(ErrorMessage = "El campo {0} es requerido")] // Atributto de Limitación de netCore
+        public int Id { get; set; }
+        [Required(ErrorMessage = "El campo {0} es requerido")]
         [StringLength(50, ErrorMessage = "El campo {0} solo admite {1} caracteres")]
         [PrimeraLetraMayuscula]
         public required string Nombre { get; set; }
-        //[Range(18,120)]
-
-        //public int Edad {  get; set; }
-        //[CreditCard] //Validacion definida por framework
-        //public string? TarjetaCredito { set; get; }
-
-        //[Url]
-        //public string? Url {  get; set; }
-
-
 
     }
 }
