@@ -27,16 +27,16 @@ var originesPermitidos = builder.Configuration.GetValue<string>("origenesPermiti
 //Se agregan permisos de CORS
 // Permite el acceso a la API desde cualquier origen
 builder.Services.AddCors(
-    opciones =>
-    {
+    opciones => {
         opciones.AddDefaultPolicy(
-            opcionesCORS =>
-            {   //Se agrega la variable que contiene los orígenes permitidos
-                opcionesCORS.WithOrigins(originesPermitidos).AllowAnyMethod().AllowAnyHeader();
-            });
+            //Se agrega la variable que contiene los orígenes permitidos
+            opcionesCORS => {
+                opcionesCORS.WithOrigins(originesPermitidos).AllowAnyMethod().AllowAnyHeader().WithExposedHeaders("totalRegistros");
+            }
+        );
     }
 
-    );
+);
 
 var app = builder.Build();
 
@@ -44,10 +44,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors();
-//Se agrega cache 1.1
-app.UseOutputCache();
-
+app.UseOutputCache(); //Se agrega cache 1.1
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
